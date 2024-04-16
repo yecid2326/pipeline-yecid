@@ -27,17 +27,16 @@ jobs:
       - name: List dist files
         run: cd dist && ls
 
-  # deploy:
-  #   needs: build
-  #   runs-on: ubuntu-latest
+      - name: Configure AWS CLI
+        run: |
+          mkdir -p ~/.aws
+          echo "[default]" > ~/.aws/config
+          echo "aws_access_key_id = ${{ secrets.AWS_ACCESS_KEY_ID }}" >> ~/.aws/config
+          echo "aws_secret_access_key = ${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> ~/.aws/config
+          echo "region = us-east-2" >> ~/.aws/config
 
-  #   steps:
-  #     - name: Deploy to S3
-  #       uses: jakejarvis/s3-sync-action@master
-  #       with:
-  #         args: --acl public-read --follow-symlinks --delete
-  #       env:
-  #         AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-  #         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #       if: success()
+        name: Borrar lo que se encuentra en el bucket
+        run: aws s3 rm s3://pipeline-yecid --recursive
+
+        name: Subir los archivos de dist para el bildeo que se sube en el bucket
+        run: aws s3 cp ./dist/pipeline/browser s3://pipeline-yecid --recursive
