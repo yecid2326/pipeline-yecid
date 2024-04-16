@@ -25,7 +25,7 @@ jobs:
         run: npm run build
 
       - name: List dist files
-        run: ls && cd dist && ls
+        run: cd dist && ls
 
   # deploy:
   #   needs: build
